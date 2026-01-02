@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.text {
+    @apply text-white;
+}
+
+.link {
+    @apply text-white hover:underline hover:text-gray-200 cursor-pointer;
+}

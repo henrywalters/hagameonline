@@ -1,0 +1,37 @@
+---
+
+import Main from "../layouts/main.astro"
+
+---
+
+<Main>
+    <div id="game" style="width: 640px; height: 480px" class="m-auto">
+        
+    </div>
+</Main>
+
+
+<script>
+
+import {Game} from "hagamets/dist/core/game";
+import {PongClientManifest} from "hagamets/dist/demos/pongMultiplayer/client";
+
+let container = document.getElementById('game');
+
+const manifest = new PongClientManifest();
+
+console.log(manifest.constructor.name)
+
+const game = new Game(manifest);
+
+const canvas = game.renderer.domElement;
+canvas.width = 640;
+canvas.height = 480;
+
+game.resize(640, 480);
+
+container?.appendChild(canvas);
+
+game.run();
+
+</script>
