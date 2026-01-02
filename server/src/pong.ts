@@ -8,7 +8,7 @@ import { Clock } from "three";
 
     const manifest = new PongServerManifest();
 
-    manifest.server.address.host = "localhost";
+    manifest.server.address.host = "167.99.127.36";
     manifest.server.address.port = 4200;
 
     const game = new Game(manifest, true);

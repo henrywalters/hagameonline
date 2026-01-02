@@ -20,7 +20,7 @@ let container = document.getElementById('game');
 
 const manifest = new PongClientManifest();
 
-console.log(manifest.constructor.name)
+manifest.client.address.host = "167.99.127.36";
 
 const game = new Game(manifest);
 
