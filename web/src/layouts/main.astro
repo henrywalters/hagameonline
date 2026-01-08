@@ -1,5 +1,10 @@
 ---
 import '../styles/global.css'
+
+import { isAuthorized } from '../lib/auth-ssr';
+
+const authorized = await isAuthorized(Astro.request);
+
 ---
 
 <html lang="en">
@@ -11,8 +16,26 @@ import '../styles/global.css'
 		<title>HaGameOnline</title>
 	</head>
 	<body class="w-full h-full bg-slate-700">
-        <header class="h-1vh bg-slate-800 p-3">
+        <header class="h-1vh bg-slate-800 p-3 flex justify-spaced">
             <a class="text-white text-xl" href="/">HaGameOnline</a>
+            <div class="flex-grow"></div>
+            
+                {
+                    !authorized && 
+                    <a href="/login">
+                        <button class="border rounded border-white text-white pr-2 pl-2 hover:border-lime-600 hover:text-lime-600 hover:cursor-pointer">
+                            Login
+                        </button>
+                    </a>
+                    
+                }
+                {
+                    authorized && 
+                    <button class="border rounded border-white text-white pr-2 pl-2 hover:border-red-600 hover:text-red-600 hover:cursor-pointer" id="logout_btn">
+                        Logout
+                    </button>
+                }
+            
         </header>
         <div class="p-3">
 		    <slot />
@@ -22,3 +45,21 @@ import '../styles/global.css'
         </footer>
 	</body>
 </html>
+
+<script>
+    import { auth } from '../lib/firebase';
+    import { 
+        signOut,
+    type UserCredential
+    } from 'firebase/auth';
+
+    const logout = document.getElementById('logout_btn');
+    if (logout) {
+        logout.addEventListener('click', async (e) => {
+            document.cookie = 'token=; Max-Age=0; path=/;';
+            await signOut(auth);
+            document.location.reload();
+            console.log(document.cookie);
+        });
+    }
+</script>

@@ -1,0 +1,134 @@
+---
+// src/components/Login.astro
+---
+
+<div id="auth-container" class="max-w-md mx-auto p-6">
+  <div id="auth-form" class="bg-white rounded-lg shadow-lg p-8">
+    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+    
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-2">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          required
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium mb-2">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          required
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      
+      <button 
+        type="submit"
+        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+      >
+        Login
+      </button>
+    </form>
+    
+    <div class="mt-4 text-center">
+      <button 
+        id="switch-to-signup"
+        class="text-blue-500 hover:underline text-sm"
+      >
+        Don't have an account? Sign up
+      </button>
+    </div>
+    
+    <div id="error-message" class="mt-4 text-red-500 text-sm hidden"></div>
+  </div>
+  
+</div>
+
+<script>
+  import { auth } from '../lib/firebase';
+  import { 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+type UserCredential
+  } from 'firebase/auth';
+  import { userStore, loadingStore } from '../lib/auth-store';
+
+  const authForm = document.getElementById('auth-form')!;
+  const loginForm = document.getElementById('login-form') as HTMLFormElement;
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+  const switchBtn = document.getElementById('switch-to-signup')!;
+  const errorMessage = document.getElementById('error-message')!;
+  const formTitle = authForm.querySelector('h2')!;
+  const submitBtn = loginForm.querySelector('button[type="submit"]')!;
+
+  let isSignupMode = false;
+
+  // Listen to auth state
+  onAuthStateChanged(auth, async (user) => {
+    userStore.set(user);
+    loadingStore.set(false);
+
+    if (user) {
+      // User is logged in
+      authForm.classList.add('hidden');
+      const token = await user.getIdToken();
+      document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+      location.replace('/');
+    } else {
+      // User is logged out
+      authForm.classList.remove('hidden');
+    }
+  });
+
+  // Handle login/signup
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMessage.classList.add('hidden');
+    
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    let credentials: UserCredential;
+    
+    try {
+      if (isSignupMode) {
+        credentials = await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        credentials = await signInWithEmailAndPassword(auth, email, password);
+      }
+
+      const token = await credentials.user.getIdToken();
+
+      document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+
+      location.replace('/');
+
+    } catch (error: any) {
+      errorMessage.textContent = error.message;
+      errorMessage.classList.remove('hidden');
+    }
+  });
+
+  // Switch between login/signup
+  switchBtn.addEventListener('click', () => {
+    isSignupMode = !isSignupMode;
+    
+    if (isSignupMode) {
+      formTitle.textContent = 'Sign Up';
+      submitBtn.textContent = 'Sign Up';
+      switchBtn.textContent = 'Already have an account? Login';
+    } else {
+      formTitle.textContent = 'Login';
+      submitBtn.textContent = 'Login';
+      switchBtn.textContent = "Don't have an account? Sign up";
+    }
+  });
+
+</script>

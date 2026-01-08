@@ -1,0 +1,45 @@
+---
+import Main from "../layouts/main.astro";
+import { isAuthorized } from "../lib/auth-ssr";
+
+const authorized = await isAuthorized(Astro.request);
+
+---
+
+<Main>
+    {
+        authorized &&
+        <div id="game" class="m-auto"></div>
+    }
+    {
+        !authorized &&
+        <p class="text">To play HaScape, you must <a href="/login" class="link underline">Login</a> first.</p>
+    }
+    
+</Main>
+
+<script>
+    import { Game } from "hagamets/dist/core/game.js";
+    import { ClientManifest } from "../games/hascape/src/manifest";
+    import { MIN_SIZE } from "../games/hascape/src/constants";
+
+    let container = document.getElementById('game');
+
+    if (container) {
+        const manifest = ClientManifest;
+
+        const game = new Game(manifest);
+
+        const canvas = game.renderer.domElement;
+        canvas.width = MIN_SIZE.x;
+        canvas.height = MIN_SIZE.y;
+        canvas.style.margin = 'auto';
+
+        game.resize(MIN_SIZE.x, MIN_SIZE.y);
+
+        container.appendChild(canvas);
+
+        game.run();
+    }
+
+</script>
