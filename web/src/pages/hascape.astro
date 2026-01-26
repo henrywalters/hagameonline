@@ -1,15 +1,73 @@
 ---
 import Main from "../layouts/main.astro";
+import { getTokenFromCookie } from "../lib/auth-ssr";
 import { isAuthorized } from "../lib/auth-ssr";
 
 const authorized = await isAuthorized(Astro.request);
+
+let canPlay = false;
+let user = {};
+let token = null;
+
+if (authorized) {
+    token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
+
+    const response = await fetch("http://localhost:4201/user", {
+        headers: {
+            Authorization: token as string,
+        }
+    });
+
+    console.log(response);
+
+    if (response.status === 200) {
+        user = await response.json();
+        canPlay = true;
+        console.log(user);
+    }
+}
 
 ---
 
 <Main>
     {
-        authorized &&
+        canPlay &&
         <div id="game" class="m-auto"></div>
+        <div id="token" data-token={token} />
+        <div id="user" data-user={JSON.stringify(user)} />
+                    
+    }
+    {
+        !canPlay && authorized && 
+        <div id="auth-container" class="max-w-md mx-auto p-6">
+            <div id="auth-form" class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center">Character Creator</h2>
+                
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Username</label>
+                        <input 
+                        type="text" 
+                        id="username" 
+                        required
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div id="token" data-token={token} />
+                    <div id="user" data-token={user} />
+                    
+                    <button 
+                        type="submit"
+                        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+                    >
+                        Login
+                    </button>
+                </form>
+                <div id="error-message" class="mt-4 text-red-500 text-sm hidden"></div>
+            </div>
+        
+        </div>
     }
     {
         !authorized &&
@@ -19,23 +77,48 @@ const authorized = await isAuthorized(Astro.request);
 </Main>
 
 <script>
-    import { Game } from "hagamets/dist/core/game.js";
-    import { ClientManifest } from "../games/hascape/src/manifest";
-    import { MIN_SIZE } from "../games/hascape/src/constants";
+
+    import { Client } from "@hascape/client/client";
+    import { Manifest } from "@hascape/client/manifest";
+
+    const loginForm = document.getElementById('login-form');
+    const username = document.getElementById('username') as HTMLInputElement;
+    const tokenEl = document.getElementById('token');
+    const userEl = document.getElementById('user');
+
+    const token = tokenEl!.dataset.token; 
+
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("?");
+
+        const response = await fetch("http://localhost:4201/user", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                authorization: token,
+            },
+            body: JSON.stringify({
+                username: username.value as string,
+            }),
+        }); 
+        window.location.reload();
+    })
 
     let container = document.getElementById('game');
 
     if (container) {
-        const manifest = ClientManifest;
+        const user = JSON.parse(userEl!.dataset.user as string);
 
-        const game = new Game(manifest);
+        const game = new Client(Manifest, user as any, token as string);
 
         const canvas = game.renderer.domElement;
-        canvas.width = MIN_SIZE.x;
-        canvas.height = MIN_SIZE.y;
+        canvas.width = 1080;
+        canvas.height = 720;
         canvas.style.margin = 'auto';
 
-        game.resize(MIN_SIZE.x, MIN_SIZE.y);
+        game.resize(1080, 720);
 
         container.appendChild(canvas);
 

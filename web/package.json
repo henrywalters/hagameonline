@@ -14,7 +14,13 @@
     "astro": "^5.16.6",
     "firebase": "^12.7.0",
     "firebase-admin": "^13.6.0",
+    "golden-layout": "^2.6.0",
+    "hagamets": "file:../../hagamets",
+    "hascape": "file:../../hascape/client",
     "nanostores": "^1.1.0",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@shoelace-style/shoelace": "^2.20.1"
   }
 }
