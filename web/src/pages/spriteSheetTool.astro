@@ -1,0 +1,65 @@
+---
+import Main from "../layouts/main.astro";
+---
+
+<Main>
+    <div class="flex">
+        <div class="border p-3 bg-white mr-3">
+            <h1>Controls</h1>
+            <p>Sprite Name</p>
+            <input type="text" id="sprite_name" class="border p-3" />
+            <p>Enter a Sprite URL</p>
+            <input type="text" id="sprite_url" class="border p-3" />
+            <button class="bg-slate-800 p-3 rounded hover:bg-slate-900 cursor-pointer text-white" id="load_sprite">Load Sprite</button>
+            <p>Cells</p>
+            <div class="flex">
+                <div>
+                    <p>Columns</p>
+                    <input type="number" step="1" id="columns" value="1" min="1" class="border p-3"  />
+                </div>
+                <div>
+                    <p>Rows</p>
+                    <input type="number" step="1" id="rows" value="1" min="1" class="border p-3" />
+                </div>
+            </div>
+            <p>Padding</p>
+            <div class="flex">
+                <div>
+                    <p>Padding X</p>
+                    <input type="number" step="1" id="padding_x" value="0" min="0" class="border p-3" />
+                </div>
+                <div>
+                    <p>Padding Y</p>
+                    <input type="number" step="1" id="padding_y" value="0" min="0" class="border p-3" />
+                </div>
+            </div>
+            <p>Offset</p>
+            <div class="flex">
+                <div>
+                    <p>Offset X</p>
+                    <input type="number" step="1" id="offset_x" value="0" class="border p-3" />
+                </div>
+                <div>
+                    <p>Offset Y</p>
+                    <input type="number" step="1" id="offset_y" value="0" class="border p-3" />
+                </div>
+            </div>
+            <button class="bg-slate-800 p-3 rounded hover:bg-slate-900 cursor-pointer text-white" id="save_sprite">Save Sprite Sheet</button>
+
+        </div>
+        <div id="game"></div>
+    </div>
+
+</Main>
+
+<script>
+    
+    import { createSpriteSheetTool } from "hagamets/dist/common/tools/spriteSheetTool/index";
+
+    let container = document.getElementById('game');
+
+    if (container) {
+        createSpriteSheetTool(container);
+    }
+
+</script>

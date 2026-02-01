@@ -15,8 +15,8 @@
     "firebase": "^12.7.0",
     "firebase-admin": "^13.6.0",
     "golden-layout": "^2.6.0",
-    "hagamets": "file:../../hagamets",
-    "hascape": "file:../../hascape/client",
+    "hagamets": "file:../../hgts",
+    "hascape": "file:../../hascape",
     "nanostores": "^1.1.0",
     "tailwindcss": "^4.1.18"
   },

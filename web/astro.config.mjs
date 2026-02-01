@@ -10,6 +10,9 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone'
   }),
+  image: {
+    domains: ['hascape.sfo3.cdn.digitaloceanspaces.com']
+  },
   vite: {
     plugins: [tailwindcss()],
     build: {
