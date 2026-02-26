@@ -5,9 +5,12 @@ import Main from "../layouts/main.astro";
 <Main>
     <div class="flex">
         <div class="border p-3 bg-white mr-3" id="ui">
-
+            
         </div>
         <div id="game"></div>
+        <div class="border p-3 bg-white ml-3" id="sidebar">
+            
+        </div>
     </div>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css" />
@@ -21,6 +24,10 @@ import Main from "../layouts/main.astro";
     import { Game } from "hagamets/dist/core/game";
 
 
-    makeMapEditor(document.getElementById('game')!, document.getElementById('ui')!);
+    makeMapEditor(
+        document.getElementById('game')! as HTMLDivElement, 
+        document.getElementById('ui')! as HTMLDivElement, 
+        document.getElementById('sidebar')! as HTMLDivElement
+    );
 
 </script>
