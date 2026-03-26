@@ -1,10 +1,12 @@
 import admin from 'firebase-admin';
+import { readFileSync } from 'fs';
 
 let app: admin.app.App;
 
 if (!admin.apps.length) {
-  // Option 1: Using service account file
-  const serviceAccount = await import(import.meta.env.FIREBASE_SERVICE_ACCOUNT_PATH);
+  const serviceAccount = JSON.parse(
+    readFileSync(import.meta.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8")
+  );
 
   app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
