@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hagameonline_frontend
+    restart: always
+    ports:
+      - "80:80"
