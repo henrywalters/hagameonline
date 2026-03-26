@@ -6,6 +6,8 @@ WORKDIR /app
 COPY hgts/ ./hgts/
 COPY hascape/ ./hascape/
 
+COPY firebase.json ./firebase.json
+
 # Copy frontend and install
 COPY hagameonline/package*.json ./hagameonline/
 WORKDIR /app/hagameonline
