@@ -7,7 +7,7 @@ services:
       dockerfile: hagameonline/Dockerfile
     container_name: hagameonline_frontend
     volumes:
-      - /firebase.json:/firebase.json:ro
+      - /root/firebase.json:/firebase.json:ro
     restart: always
     expose:
       - "4321"
