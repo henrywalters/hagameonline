@@ -11,12 +11,12 @@ services:
     environment:
       FIREBASE_SERVICE_ACCOUNT_PATH: /firebase.json
     restart: always
-    expose:
-      - "4321"
+    networks:
+      - web
 
   nginx:
     image: nginx:stable-alpine
-    container_name: hagameonline_nginx
+    container_name: nginx
     restart: always
     ports:
       - "80:80"
@@ -26,7 +26,9 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - frontend
+    networks:
+      - web
 
 networks:
-  default:
-    name: hagameonline_net
+  web:
+    external: true
