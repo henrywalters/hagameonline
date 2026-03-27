@@ -93,7 +93,7 @@ if (authorized) {
         e.stopPropagation();
         console.log("?");
 
-        const response = await fetch("http://localhost:4201/user", {
+        const response = await fetch(import.meta.env.PUBLIC_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -110,6 +110,9 @@ if (authorized) {
 
     if (container) {
         const user = JSON.parse(userEl!.dataset.user as string);
+
+        Manifest.client.address.url = import.meta.env.PUBLIC_SERVER_URL;
+        Manifest.client.address.secure = import.meta.env.PUBLIC_SERVER_SECURE == 'true' ? true : false;
 
         const game = new Client(Manifest, user as any, token as string);
 
