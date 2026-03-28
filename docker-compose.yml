@@ -7,7 +7,7 @@ services:
       dockerfile: hagameonline/Dockerfile
     container_name: hagameonline_frontend
     volumes:
-      - /root/firebase.json:/app/firebase.json:ro
+      - /root/firebase.json:/firebase.json:ro
     environment:
       FIREBASE_SERVICE_ACCOUNT_PATH: /firebase.json
     restart: always
