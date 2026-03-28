@@ -24,6 +24,6 @@ export function getTokenFromCookie(cookieHeader: string | null): string | null {
 export async function isAuthorized(request: Request): Promise<boolean> {
     const token = getTokenFromCookie(request.headers.get('cookie'));
     if (!token) return false;
-    if (await verifyToken(token)) return true;
-    return false;
+    const valid = await verifyToken(token);
+    return valid ? true : false;
 }

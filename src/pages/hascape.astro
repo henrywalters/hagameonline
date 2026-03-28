@@ -12,7 +12,7 @@ let token = null;
 if (authorized) {
     token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
 
-    const response = await fetch(import.meta.env.PUBLIC_API_URL, {
+    const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/user`, {
         headers: {
             Authorization: token as string,
         }
@@ -22,6 +22,7 @@ if (authorized) {
 
     if (response.status === 200) {
         user = await response.json();
+        console.log(user);
         canPlay = true;
         console.log(user);
     }
