@@ -94,7 +94,7 @@ if (authorized) {
         e.stopPropagation();
         console.log("?");
 
-        const response = await fetch(import.meta.env.PUBLIC_API_URL, {
+        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -103,7 +103,8 @@ if (authorized) {
             body: JSON.stringify({
                 username: username.value as string,
             }),
-        }); 
+        });
+        console.log(response); 
         window.location.reload();
     })
 
