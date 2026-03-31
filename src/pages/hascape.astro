@@ -1,5 +1,6 @@
 ---
 import Main from "../layouts/main.astro";
+import { getPlayers, getUser } from "../lib/api";
 import { getTokenFromCookie } from "../lib/auth-ssr";
 import { isAuthorized } from "../lib/auth-ssr";
 
@@ -9,22 +10,26 @@ let canPlay = false;
 let user = {};
 let token = null;
 
+let players = [];
+let player = {};
+
 if (authorized) {
     token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
 
-    const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/user`, {
-        headers: {
-            Authorization: token as string,
+    user = await getUser(token as string);
+
+    if (!user) Astro.redirect('/login');
+
+    players = await getPlayers(token as string);
+
+    if (Astro.url.searchParams.has('id')) {
+        for (const p of players) {
+            if (p.id === Astro.url.searchParams.get('id')) {
+                player = p;
+                console.log(player);
+                canPlay = true;
+            }
         }
-    });
-
-    console.log(response);
-
-    if (response.status === 200) {
-        user = await response.json();
-        console.log(user);
-        canPlay = true;
-        console.log(user);
     }
 }
 
@@ -35,15 +40,22 @@ if (authorized) {
         canPlay &&
         <div id="game" class="m-auto"></div>
         <div id="token" data-token={token} />
-        <div id="user" data-user={JSON.stringify(user)} />
+        <div id="player" data-player={JSON.stringify(player)} />
                     
     }
     {
         !canPlay && authorized && 
         <div id="auth-container" class="max-w-md mx-auto p-6">
             <div id="auth-form" class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-2xl font-bold mb-6 text-center">Character Creator</h2>
+                <h2 class="text-xl font-bold mb-6 text-center">Character Selection</h2>
                 
+                {
+                    players.map((player: any) => <a href=`/hascape?id=${player.id}`>
+                        <button class="border rounded mb-2 hover:bg-blue-600 hover:text-white w-full p-3 hover:cursor-pointer">{player.username}</button>
+                    </a>)
+                }
+
+                <h4 class="text-xl font-bold mb-6 mt-6 text-center">Create New Character</h4>
                 <form id="login-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium mb-2">Username</label>
@@ -62,10 +74,10 @@ if (authorized) {
                         type="submit"
                         class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
                     >
-                        Login
+                        Create New Player
                     </button>
                 </form>
-                <div id="error-message" class="mt-4 text-red-500 text-sm hidden"></div>
+                <div id="error-message" class="mt-4 text-red-500 text-sm hidden text-center"></div>
             </div>
         
         </div>
@@ -85,16 +97,18 @@ if (authorized) {
     const loginForm = document.getElementById('login-form');
     const username = document.getElementById('username') as HTMLInputElement;
     const tokenEl = document.getElementById('token');
-    const userEl = document.getElementById('user');
+    const playerEl = document.getElementById('player');
+    const errorEl = document.getElementById('error-message')!;
 
     const token = tokenEl!.dataset.token; 
 
     loginForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("?");
 
-        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/user`, {
+        errorEl.classList.add('hidden');
+
+        const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/player`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,19 +118,28 @@ if (authorized) {
                 username: username.value as string,
             }),
         });
-        console.log(response); 
-        window.location.reload();
+        const res = await response.json();
+
+        if (response.status === 200) {
+            window.location.replace(`/hascape?id=${res.id}`);
+        } else {
+            errorEl.classList.remove('hidden');
+            errorEl.innerHTML = res.error;
+        }
+        // window.location.reload();
     })
 
     let container = document.getElementById('game');
 
     if (container) {
-        const user = JSON.parse(userEl!.dataset.user as string);
+        const player = JSON.parse(playerEl!.dataset.player as string);
 
         Manifest.client.address.url = import.meta.env.PUBLIC_SERVER_URL;
         Manifest.client.address.secure = import.meta.env.PUBLIC_SERVER_SECURE == 'true' ? true : false;
 
-        const game = new Client(Manifest, user as any, token as string);
+        const game = new Client(Manifest, player as any, token as string, () => {
+            window.location.replace('/hascape');
+        });
 
         const canvas = game.renderer.domElement;
         canvas.width = 1080;

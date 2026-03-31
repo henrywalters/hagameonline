@@ -1,9 +1,24 @@
 ---
 import '../styles/global.css'
 
-import { isAuthorized } from '../lib/auth-ssr';
+import { getTokenFromCookie, isAuthorized } from '../lib/auth-ssr';
+import { getUser } from '../lib/api';
 
 const authorized = await isAuthorized(Astro.request);
+
+let user;
+
+let isAdmin = false;
+
+if (authorized) {
+    const token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
+
+    user = await getUser(token as string);
+
+    if (!user) Astro.redirect('/login');
+
+    isAdmin = user.authLevel === 'admin' || user.authLevel === 'super_admin';
+}
 
 ---
 
@@ -19,11 +34,19 @@ const authorized = await isAuthorized(Astro.request);
         <header class="h-1vh bg-slate-800 p-3 flex justify-spaced">
             <a class="text-white text-xl" href="/">HaGameOnline</a>
             <div class="flex-grow"></div>
-            
+
+                {
+                    authorized && isAdmin &&
+                    <a href="/users">
+                        <button class="border rounded border-white text-white pr-2 pl-2 mr-2 h-10 hover:border-blue-600 hover:text-blue-600 hover:cursor-pointer">
+                            Users
+                        </button>
+                    </a>
+                }
                 {
                     !authorized && 
                     <a href="/login">
-                        <button class="border rounded border-white text-white pr-2 pl-2 hover:border-lime-600 hover:text-lime-600 hover:cursor-pointer">
+                        <button class="border rounded border-white text-white pr-2 pl-2 h-10 hover:border-lime-600 hover:text-lime-600 hover:cursor-pointer">
                             Login
                         </button>
                     </a>
@@ -31,7 +54,7 @@ const authorized = await isAuthorized(Astro.request);
                 }
                 {
                     authorized && 
-                    <button class="border rounded border-white text-white pr-2 pl-2 hover:border-red-600 hover:text-red-600 hover:cursor-pointer" id="logout_btn">
+                    <button class="border rounded border-white text-white pr-2 pl-2 h-10 hover:border-red-600 hover:text-red-600 hover:cursor-pointer" id="logout_btn">
                         Logout
                     </button>
                 }
