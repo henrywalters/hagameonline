@@ -5,6 +5,9 @@ WORKDIR /app
 # Copy local file: dependencies first
 COPY hgts/ ./hgts/
 COPY hascape/ ./hascape/
+
+WORKSPACE /app/hascape/client
+RUN npm run build
  
 # Copy frontend and install
 COPY hagameonline/package*.json ./hagameonline/
