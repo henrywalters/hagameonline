@@ -6,6 +6,9 @@ WORKDIR /app
 COPY hgts/ ./hgts/
 COPY hascape/ ./hascape/
 
+WORKDIR /app/hascape/common
+RUN npm run build
+
 WORKDIR /app/hascape/client
 RUN npm run build
  
