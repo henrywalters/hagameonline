@@ -6,7 +6,7 @@ WORKDIR /app
 COPY hgts/ ./hgts/
 COPY hascape/ ./hascape/
 
-WORKSPACE /app/hascape/client
+WORKDIR /app/hascape/client
 RUN npm run build
  
 # Copy frontend and install
