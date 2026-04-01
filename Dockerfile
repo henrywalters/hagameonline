@@ -6,11 +6,16 @@ WORKDIR /app
 COPY hgts/ ./hgts/
 COPY hascape/ ./hascape/
 
+WORKDIR /app/hgts
+RUN npm run build
+
 WORKDIR /app/hascape/common
 RUN npm run build
 
 WORKDIR /app/hascape/client
 RUN npm run build
+
+WORKDIR /app
  
 # Copy frontend and install
 COPY hagameonline/package*.json ./hagameonline/
