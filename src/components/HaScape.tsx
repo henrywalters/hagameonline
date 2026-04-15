@@ -71,6 +71,8 @@ function HaScapeGame({player, apiUrl, token}: {player: IPlayer, apiUrl: string, 
             window.location.replace('/hascape');
         });
 
+        await game.initialize();
+
         const canvas = game.renderer.domElement;
         canvas.width = 1080;
         canvas.height = 720;
