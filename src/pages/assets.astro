@@ -1,0 +1,26 @@
+---
+import Tiles from "../components/Tiles";
+import Prefabs from "../components/Prefabs";
+import Main from "../layouts/main.astro";
+import { getUser } from "../lib/api";
+import { getTokenFromCookie } from "../lib/auth-ssr";
+import { isAuthorized } from "../lib/auth-ssr";
+
+const authorized = await isAuthorized(Astro.request);
+
+let token;
+let user = {};
+
+if (!authorized) {
+    return Astro.redirect('/login');
+}
+ 
+token = getTokenFromCookie(Astro.request.headers.get('cookie'));
+
+user = await getUser(token as string);
+
+---
+<Main>
+    <Tiles token={token as string} apiUrl={import.meta.env.PUBLIC_API_URL as string} client:load />
+    <Prefabs token={token as string} apiUrl={import.meta.env.PUBLIC_API_URL as string} client:load />
+</Main>

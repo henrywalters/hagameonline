@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onIdTokenChanged } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
@@ -12,3 +12,11 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+onIdTokenChanged(auth, async (user) => {
+    if (user) {
+        console.log("Token Refreshed");
+        const token = await user.getIdToken();
+        document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+    } 
+})

@@ -108,7 +108,13 @@ type UserCredential
 
       document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
 
-      location.replace('/');
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.has('redirect_to')) {
+        location.replace(`/${params.get('redirect_to')}`)
+      } else {
+        location.replace('/');
+      }
 
     } catch (error: any) {
       errorMessage.textContent = error.message;

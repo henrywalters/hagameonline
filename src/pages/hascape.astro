@@ -1,95 +1,24 @@
 ---
 import Main from "../layouts/main.astro";
-import { getPlayers, getUser } from "../lib/api";
-import { getTokenFromCookie } from "../lib/auth-ssr";
-import { isAuthorized } from "../lib/auth-ssr";
+import HaScape from "../components/HaScape";
+import { isAuthorized, getTokenFromCookie } from "../lib/auth-ssr";
 
 const authorized = await isAuthorized(Astro.request);
 
-let canPlay = false;
-let user = {};
-let token = null;
-
-let players = [];
-let player = {};
-
-if (authorized) {
-    token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
-
-    user = await getUser(token as string);
-
-    if (!user) Astro.redirect('/login');
-
-    players = await getPlayers(token as string);
-
-    if (Astro.url.searchParams.has('id')) {
-        for (const p of players) {
-            if (p.id === Astro.url.searchParams.get('id')) {
-                player = p;
-                console.log(player);
-                canPlay = true;
-            }
-        }
-    }
+if (!authorized) {
+    return Astro.redirect('/login?redirect_to=mapEditor');
 }
 
----
+const token = await getTokenFromCookie(Astro.request.headers.get('cookie'));
+const playerId = Astro.url.searchParams.get('id');
+
+--- 
 
 <Main>
-    {
-        canPlay &&
-        <div id="game" class="m-auto"></div>
-        <div id="token" data-token={token} />
-        <div id="player" data-player={JSON.stringify(player)} />
-                    
-    }
-    {
-        !canPlay && authorized && 
-        <div id="auth-container" class="max-w-md mx-auto p-6">
-            <div id="auth-form" class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-xl font-bold mb-6 text-center">Character Selection</h2>
-                
-                {
-                    players.map((player: any) => <a href=`/hascape?id=${player.id}`>
-                        <button class="border rounded mb-2 hover:bg-blue-600 hover:text-white w-full p-3 hover:cursor-pointer">{player.username}</button>
-                    </a>)
-                }
-
-                <h4 class="text-xl font-bold mb-6 mt-6 text-center">Create New Character</h4>
-                <form id="login-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Username</label>
-                        <input 
-                        type="text" 
-                        id="username" 
-                        required
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div id="token" data-token={token} />
-                    <div id="user" data-token={user} />
-                    
-                    <button 
-                        type="submit"
-                        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-                    >
-                        Create New Player
-                    </button>
-                </form>
-                <div id="error-message" class="mt-4 text-red-500 text-sm hidden text-center"></div>
-            </div>
-        
-        </div>
-    }
-    {
-        !authorized &&
-        <p class="text">To play HaScape, you must <a href="/login" class="link underline">Login</a> first.</p>
-    }
-    
+    <HaScape token={token as string} apiUrl={import.meta.env.PUBLIC_API_URL as string} playerId={playerId} client:only />
 </Main>
 
-<script>
+<!-- <script>
     
     import { Client } from "@hascape/client/client";
     import { Manifest } from "@hascape/client/manifest";
@@ -153,4 +82,4 @@ if (authorized) {
         game.run();
     }
 
-</script>
+</script> -->
