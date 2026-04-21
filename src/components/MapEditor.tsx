@@ -2,6 +2,8 @@ import type { IMap, ITile } from "@hascape/common";
 import { API, type Result } from "../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { TileForm } from "./Tiles";
+import { Modal } from "./Modal";
+import { DialogueEditor } from "./DialogueEditor";
 
 import { Game } from "hagamets/dist/core/game.js";
 import { EditorRuntime, EditorManifest, TOOL_TYPES, ToolType } from "@hascape/client/editor";
@@ -174,6 +176,7 @@ function Sidebar({api, mapApi}: SidebarProps) {
 
     return (
         <div className="border p-3 bg-white mr-3" id="ui">
+            {/* <Modal title={"Dialgoue Editor"} body={<DialogueEditor></DialogueEditor>} onClose={() => console.log()} /> */}
             {
                 selectingMap && <MapPicker maps={maps} onClose={() => setSelectingMap(false)} setMap={selectMap}/>
             }
